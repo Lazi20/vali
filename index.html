@@ -271,6 +271,8 @@
 
     noBtn.addEventListener("mouseenter", () => {
   const screen = document.body.getBoundingClientRect();
+
+  // Tiltott zónák (szövegek + igen gomb)
   const forbidden = [
     document.getElementById("titleText").getBoundingClientRect(),
     document.querySelector(".card p").getBoundingClientRect(),
@@ -282,6 +284,7 @@
   const btnHeight = noBtn.offsetHeight;
 
   while (tries < 50) {
+    // Új pozíció a képernyőn belül
     x = Math.random() * (screen.width - btnWidth);
     y = Math.random() * (screen.height - btnHeight);
 
@@ -294,6 +297,7 @@
 
     let overlaps = false;
 
+    // Ütközésvizsgálat
     for (const zone of forbidden) {
       const hit =
         !(future.right < zone.left ||
@@ -315,6 +319,7 @@
   noBtn.style.left = x + "px";
   noBtn.style.top = y + "px";
 });
+
 
 
     // kattintásra csak kisebb lesz, pozíció marad
