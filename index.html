@@ -195,7 +195,7 @@
   <!-- Fő Valentin oldal -->
   <div id="mainContent">
     <div class="card">
-      <h1>Leszel a Valentinom? 💘</h1>
+      <h1 id="titleText"></h1>
       <p>Gondold át jól… de az „Igen” amúgy nagyon jó választás 😏</p>
 
       <div class="buttons">
@@ -236,6 +236,13 @@
       }
     });
 
+    function typeWriter(text, element, speed = 60) { 
+      let i = 0; function typing() { 
+        if (i < text.length) { 
+          element.innerHTML += text.charAt(i); 
+          i++; setTimeout(typing, speed); } } typing(); } 
+    const title = document.getElementById("titleText"); 
+    typeWriter("Leszel a Valentinom? 💘", title);
     // Szívecskék folyamatosan
     setInterval(() => {
       const heart = document.createElement("div");
@@ -268,7 +275,19 @@
     }
 
  // NEM gomb menekül (ultra menekülős mód) 
-    noBtn.addEventListener("mouseenter", () => { const screenWidth = window.innerWidth; const screenHeight = window.innerHeight; const randomX = Math.random() * (screenWidth - noBtn.offsetWidth); const randomY = Math.random() * (screenHeight - noBtn.offsetHeight); noBtn.style.position = "fixed"; noBtn.style.left = randomX + "px"; noBtn.style.top = randomY + "px"; });
+noBtn.addEventListener("mouseenter", () => {
+  const box = noBtn.parentElement.getBoundingClientRect();
+
+  const maxX = box.width - noBtn.offsetWidth;
+  const maxY = box.height - noBtn.offsetHeight;
+
+  // nagyobb mozgás, de a kártyán belül marad
+  const randomX = (Math.random() * maxX) - maxX / 2;
+  const randomY = (Math.random() * maxY) - maxY / 2;
+
+  noBtn.style.transform = `translate(${randomX}px, ${randomY}px)`;
+});
+
   </script>
 
 </body>
