@@ -18,7 +18,6 @@
       height: 100vh;
     }
 
-    /* Szívecskék */
     .heart {
       position: fixed;
       bottom: -20px;
@@ -32,7 +31,6 @@
       100% { transform: translateY(-120vh) scale(1.8); opacity: 0; }
     }
 
-    /* Jelszó képernyő */
     #loginScreen {
       position: fixed;
       inset: 0;
@@ -77,7 +75,6 @@
       font-size: 1rem;
     }
 
-    /* A fő Valentin oldal alapból rejtve */
     #mainContent {
       display: none;
       height: 100vh;
@@ -110,39 +107,37 @@
     }
 
     .buttons {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
       position: relative;
+      height: 80px;
+      margin-top: 20px;
     }
 
-    button {
+    #yesBtn, #noBtn {
       padding: 12px 28px;
       border: none;
       border-radius: 999px;
       font-size: 1rem;
       cursor: pointer;
       transition: 0.2s ease;
+      position: absolute;
     }
 
     #yesBtn {
       background: #ff2f6f;
       color: white;
+      left: 0;
+      top: 0;
       box-shadow: 0 8px 20px rgba(255, 47, 111, 0.4);
-    }
-
-    #yesBtn:hover {
-      transform: scale(1.05);
     }
 
     #noBtn {
       background: white;
       color: #ff2f6f;
       border: 2px solid #ff2f6f;
-      position: relative;
+      right: 0;
+      top: 0;
     }
 
-    /* Felugró üzenet */
     .popup {
       position: fixed;
       inset: 0;
@@ -179,10 +174,8 @@
 </head>
 <body>
 
-  <!-- Szívecskék -->
   <div id="heartContainer"></div>
 
-  <!-- Jelszó képernyő -->
   <div id="loginScreen">
     <div id="loginBox">
       <h2>Írd be a jelszót 💘</h2>
@@ -192,7 +185,6 @@
     </div>
   </div>
 
-  <!-- Fő Valentin oldal -->
   <div id="mainContent">
     <div class="card">
       <h1 id="titleText"></h1>
@@ -205,7 +197,6 @@
     </div>
   </div>
 
-  <!-- Felugró üzenet -->
   <div class="popup" id="popup">
     <div class="popup-card">
       💖 Tudtam, hogy igent mondasz, Pannika! 💖<br>
@@ -222,11 +213,9 @@
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
     const popup = document.getElementById("popup");
-    const heartContainer = document.getElementById("heartContainer");
 
-    const correctPassword = "asd"; // <-- Itt tudod átírni
+    const correctPassword = "asd";
 
-    // Jelszó ellenőrzés
     loginBtn.addEventListener("click", () => {
       if (passwordInput.value === correctPassword) {
         loginScreen.style.display = "none";
@@ -236,14 +225,20 @@
       }
     });
 
-    function typeWriter(text, element, speed = 60) { 
-      let i = 0; function typing() { 
-        if (i < text.length) { 
-          element.innerHTML += text.charAt(i); 
-          i++; setTimeout(typing, speed); } } typing(); } 
-    const title = document.getElementById("titleText"); 
-    typeWriter("Leszel a Valentinom? 💘", title);
-    // Szívecskék folyamatosan
+    function typeWriter(text, element, speed = 60) {
+      let i = 0;
+      function typing() {
+        if (i < text.length) {
+          element.innerHTML += text.charAt(i);
+          i++;
+          setTimeout(typing, speed);
+        }
+      }
+      typing();
+    }
+
+    typeWriter("Leszel a Valentinom? 💘", document.getElementById("titleText"));
+
     setInterval(() => {
       const heart = document.createElement("div");
       heart.classList.add("heart");
@@ -255,48 +250,50 @@
       setTimeout(() => heart.remove(), 5000);
     }, 300);
 
-    // IGEN gomb → felugró + extra szívecskék
     yesBtn.addEventListener("click", () => {
       popup.classList.add("show");
-      createHearts(30)*2;
     });
 
-    function createHearts(amount) {
-      for (let i = 0; i < amount; i++) {
-        const heart = document.createElement("div");
-        heart.classList.add("heart");
-        heart.textContent = "💗";
-        heart.style.left = Math.random() * 100 + "vw";
-        heart.style.animationDuration = 3 + Math.random() * 2 + "s";
-        heart.style.fontSize = 1 + Math.random() * 1.5 + "rem";
-        document.body.appendChild(heart);
-        setTimeout(() => heart.remove(), 5000);
+    let noScale = 1;
+
+    noBtn.addEventListener("mouseenter", () => {
+      const box = noBtn.parentElement.getBoundingClientRect();
+      const yesRect = yesBtn.getBoundingClientRect();
+
+      const maxX = box.width - noBtn.offsetWidth;
+      const maxY = box.height - noBtn.offsetHeight;
+
+      let x, y, tries = 0;
+
+      while (tries < 30) {
+        x = Math.random() * maxX;
+        y = Math.random() * maxY;
+
+        const future = {
+          left: box.left + x,
+          right: box.left + x + noBtn.offsetWidth,
+          top: box.top + y,
+          bottom: box.top + y + noBtn.offsetHeight
+        };
+
+        const overlap =
+          !(future.right < yesRect.left ||
+            future.left > yesRect.right ||
+            future.bottom < yesRect.top ||
+            future.top > yesRect.bottom);
+
+        if (!overlap) break;
+        tries++;
       }
-    }
 
-// NEM gomb menekül (ultra menekülős mód) 
-noBtn.addEventListener("mouseenter", () => {
-  const box = noBtn.parentElement.getBoundingClientRect();
+      noBtn.style.left = x + "px";
+      noBtn.style.top = y + "px";
+    });
 
-  const maxX = box.width - noBtn.offsetWidth;
-  const maxY = box.height - noBtn.offsetHeight;
-
-  const randomX = (Math.random() * maxX) - maxX / 2;
-  const randomY = (Math.random() * maxY) - maxY / 2;
-
-  // Ha már volt scale, ne írjuk felül
-  const currentTransform = noBtn.style.transform || "";
-
-  noBtn.style.transform = `${currentTransform} translate(${randomX}px, ${randomY}px)`;
-});
-
-// NEM gomb kattintás → legyen kisebb
-noBtn.addEventListener("click", () => {
-  const currentTransform = noBtn.style.transform || "";
-  noBtn.style.transform = `${currentTransform} scale(0.7)`;
-});
-
-
+    noBtn.addEventListener("click", () => {
+      noScale *= 0.8;
+      noBtn.style.transform = `scale(${noScale})`;
+    });
   </script>
 
 </body>
