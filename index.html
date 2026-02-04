@@ -274,19 +274,28 @@
       }
     }
 
- // NEM gomb menekül (ultra menekülős mód) 
+// NEM gomb menekül (ultra menekülős mód) 
 noBtn.addEventListener("mouseenter", () => {
   const box = noBtn.parentElement.getBoundingClientRect();
 
   const maxX = box.width - noBtn.offsetWidth;
   const maxY = box.height - noBtn.offsetHeight;
 
-  // nagyobb mozgás, de a kártyán belül marad
   const randomX = (Math.random() * maxX) - maxX / 2;
   const randomY = (Math.random() * maxY) - maxY / 2;
 
-  noBtn.style.transform = `translate(${randomX}px, ${randomY}px)`;
+  // Ha már volt scale, ne írjuk felül
+  const currentTransform = noBtn.style.transform || "";
+
+  noBtn.style.transform = `${currentTransform} translate(${randomX}px, ${randomY}px)`;
 });
+
+// NEM gomb kattintás → legyen kisebb
+noBtn.addEventListener("click", () => {
+  const currentTransform = noBtn.style.transform || "";
+  noBtn.style.transform = `${currentTransform} scale(0.7)`;
+});
+
 
   </script>
 
