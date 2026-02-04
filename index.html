@@ -1,3 +1,284 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <title>Valentin belépés 💘</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #ff9fb8, #ff6b81);
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    /* Szívecskék */
+    .heart {
+      position: fixed;
+      bottom: -20px;
+      font-size: 1.5rem;
+      animation: floatUp 4s linear forwards;
+      pointer-events: none;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-120vh) scale(1.8); opacity: 0; }
+    }
+
+    /* Jelszó képernyő */
+    #loginScreen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(6px);
+      z-index: 10;
+    }
+
+    #loginBox {
+      background: rgba(255,255,255,0.85);
+      padding: 30px 40px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    #loginBox h2 {
+      color: #ff2f6f;
+      margin-bottom: 15px;
+    }
+
+    #passwordInput {
+      padding: 10px 15px;
+      border-radius: 10px;
+      border: 2px solid #ff2f6f;
+      font-size: 1rem;
+      outline: none;
+      margin-bottom: 15px;
+    }
+
+    #loginBtn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      background: #ff2f6f;
+      color: white;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    /* A fő Valentin oldal alapból rejtve */
+    #mainContent {
+      display: none;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.85);
+      padding: 40px 30px;
+      border-radius: 25px;
+      text-align: center;
+      width: 90%;
+      max-width: 420px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+      position: relative;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #ff2f6f;
+      margin-bottom: 15px;
+    }
+
+    p {
+      color: #444;
+      margin-bottom: 25px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      position: relative;
+    }
+
+    button {
+      padding: 12px 28px;
+      border: none;
+      border-radius: 999px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    #yesBtn {
+      background: #ff2f6f;
+      color: white;
+      box-shadow: 0 8px 20px rgba(255, 47, 111, 0.4);
+    }
+
+    #yesBtn:hover {
+      transform: scale(1.05);
+    }
+
+    #noBtn {
+      background: white;
+      color: #ff2f6f;
+      border: 2px solid #ff2f6f;
+      position: relative;
+    }
+
+    /* Felugró üzenet */
+    .popup {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.3s ease;
+    }
+
+    .popup.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .popup-card {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 20px;
+      font-size: 1.4rem;
+      color: #ff2f6f;
+      transform: scale(0.7);
+      transition: 0.3s ease;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .popup.show .popup-card {
+      transform: scale(1);
+    }
+  </style>
+</head>
 <body>
-  <h1>asd</h1>
+
+  <!-- Szívecskék -->
+  <div id="heartContainer"></div>
+
+  <!-- Jelszó képernyő -->
+  <div id="loginScreen">
+    <div id="loginBox">
+      <h2>Írd be a jelszót 💘</h2>
+      <input type="password" id="passwordInput" placeholder="Jelszó..." />
+      <br>
+      <button id="loginBtn">Belépés</button>
+    </div>
+  </div>
+
+  <!-- Fő Valentin oldal -->
+  <div id="mainContent">
+    <div class="card">
+      <h1>Leszel a Valentinom? 💘</h1>
+      <p>Gondold át jól… de az „Igen” amúgy nagyon jó választás 😏</p>
+
+      <div class="buttons">
+        <button id="yesBtn">Igen 💖</button>
+        <button id="noBtn">Nem 😢</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Felugró üzenet -->
+  <div class="popup" id="popup">
+    <div class="popup-card">
+      💖 Tudtam, hogy igent mondasz! 💖<br>
+      Most már hivatalos: te vagy a Valentinom! 🌹
+    </div>
+  </div>
+
+  <script>
+    const loginBtn = document.getElementById("loginBtn");
+    const loginScreen = document.getElementById("loginScreen");
+    const mainContent = document.getElementById("mainContent");
+    const passwordInput = document.getElementById("passwordInput");
+
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const popup = document.getElementById("popup");
+    const heartContainer = document.getElementById("heartContainer");
+
+    const correctPassword = "love2024"; // <-- Itt tudod átírni
+
+    // Jelszó ellenőrzés
+    loginBtn.addEventListener("click", () => {
+      if (passwordInput.value === correctPassword) {
+        loginScreen.style.display = "none";
+        mainContent.style.display = "flex";
+      } else {
+        passwordInput.style.borderColor = "red";
+      }
+    });
+
+    // Szívecskék folyamatosan
+    setInterval(() => {
+      const heart = document.createElement("div");
+      heart.classList.add("heart");
+      heart.textContent = "💗";
+      heart.style.left = Math.random() * 100 + "vw";
+      heart.style.animationDuration = 3 + Math.random() * 2 + "s";
+      heart.style.fontSize = 1 + Math.random() * 1.5 + "rem";
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 5000);
+    }, 300);
+
+    // IGEN gomb → felugró + extra szívecskék
+    yesBtn.addEventListener("click", () => {
+      popup.classList.add("show");
+      createHearts(30);
+    });
+
+    function createHearts(amount) {
+      for (let i = 0; i < amount; i++) {
+        const heart = document.createElement("div");
+        heart.classList.add("heart");
+        heart.textContent = "💗";
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.animationDuration = 3 + Math.random() * 2 + "s";
+        heart.style.fontSize = 1 + Math.random() * 1.5 + "rem";
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 5000);
+      }
+    }
+
+    // NEM gomb menekül
+    noBtn.addEventListener("mouseenter", () => {
+      const box = noBtn.parentElement.getBoundingClientRect();
+      const maxX = box.width - noBtn.offsetWidth;
+      const maxY = box.height - noBtn.offsetHeight;
+
+      const randomX = Math.random() * maxX - maxX / 2;
+      const randomY = Math.random() * maxY - maxY / 2;
+
+      noBtn.style.transform = `translate(${randomX}px, ${randomY}px)`;
+    });
+  </script>
+
 </body>
+</html>
