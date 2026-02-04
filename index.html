@@ -208,7 +208,7 @@
   <!-- Felugró üzenet -->
   <div class="popup" id="popup">
     <div class="popup-card">
-      💖 Tudtam, hogy igent mondasz! 💖<br>
+      💖 Tudtam, hogy igent mondasz, Pannika! 💖<br>
       Most már hivatalos: te vagy a Valentinom! 🌹
     </div>
   </div>
@@ -267,17 +267,8 @@
       }
     }
 
-    // NEM gomb menekül
-    noBtn.addEventListener("mouseenter", () => {
-      const box = noBtn.parentElement.getBoundingClientRect();
-      const maxX = box.width - noBtn.offsetWidth;
-      const maxY = box.height - noBtn.offsetHeight;
-
-      const randomX = Math.random() * maxX - maxX / 2;
-      const randomY = Math.random() * maxY - maxY / 2;
-
-      noBtn.style.transform = `translate(${randomX}px, ${randomY}px)`;
-    });
+ // NEM gomb menekül (ultra menekülős mód) 
+    noBtn.addEventListener("mouseenter", () => { const screenWidth = window.innerWidth; const screenHeight = window.innerHeight; const randomX = Math.random() * (screenWidth - noBtn.offsetWidth); const randomY = Math.random() * (screenHeight - noBtn.offsetHeight); noBtn.style.position = "fixed"; noBtn.style.left = randomX + "px"; noBtn.style.top = randomY + "px"; });
   </script>
 
 </body>
