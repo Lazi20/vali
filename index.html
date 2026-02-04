@@ -44,7 +44,7 @@
     }
 
     #loginBox {
-      background: rgba(255,255,255,0.85);
+      background: rgba(255,255,255,0.95);
       padding: 30px 40px;
       border-radius: 20px;
       text-align: center;
@@ -62,7 +62,7 @@
       border: 2px solid #ff2f6f;
       font-size: 1rem;
       outline: none;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
 
     #loginBtn {
@@ -73,12 +73,19 @@
       color: white;
       cursor: pointer;
       font-size: 1rem;
+      margin-top: 5px;
+    }
+
+    #errorMsg {
+      margin-top: 8px;
+      font-size: 0.9rem;
+      color: red;
+      min-height: 1em;
     }
 
     #mainContent {
-      display: none;
+      display: none;        /* csak JS kapcsolja be */
       height: 100vh;
-      display: flex;
       align-items: center;
       justify-content: center;
     }
@@ -108,8 +115,8 @@
 
     .buttons {
       position: relative;
-      height: 80px;
-      margin-top: 20px;
+      height: 80px;      /* itt mozog a Nem gomb, a szöveg alatt */
+      margin-top: 10px;
     }
 
     #yesBtn, #noBtn {
@@ -126,8 +133,12 @@
       background: #ff2f6f;
       color: white;
       left: 0;
-      top: 0;
+      top: 20px;
       box-shadow: 0 8px 20px rgba(255, 47, 111, 0.4);
+    }
+
+    #yesBtn:hover {
+      transform: scale(1.05);
     }
 
     #noBtn {
@@ -135,7 +146,7 @@
       color: #ff2f6f;
       border: 2px solid #ff2f6f;
       right: 0;
-      top: 0;
+      top: 20px;
     }
 
     .popup {
@@ -180,7 +191,7 @@
     <div id="loginBox">
       <h2>Írd be a jelszót 💘</h2>
       <input type="password" id="passwordInput" placeholder="Jelszó..." />
-      <br>
+      <div id="errorMsg"></div>
       <button id="loginBtn">Belépés</button>
     </div>
   </div>
@@ -209,6 +220,7 @@
     const loginScreen = document.getElementById("loginScreen");
     const mainContent = document.getElementById("mainContent");
     const passwordInput = document.getElementById("passwordInput");
+    const errorMsg = document.getElementById("errorMsg");
 
     const yesBtn = document.getElementById("yesBtn");
     const noBtn = document.getElementById("noBtn");
@@ -222,6 +234,7 @@
         mainContent.style.display = "flex";
       } else {
         passwordInput.style.borderColor = "red";
+        errorMsg.textContent = "Hibás jelszó! 😢";
       }
     });
 
@@ -257,39 +270,54 @@
     let noScale = 1;
 
     noBtn.addEventListener("mouseenter", () => {
-      const box = noBtn.parentElement.getBoundingClientRect();
-      const yesRect = yesBtn.getBoundingClientRect();
+  const screen = document.body.getBoundingClientRect();
+  const forbidden = [
+    document.getElementById("titleText").getBoundingClientRect(),
+    document.querySelector(".card p").getBoundingClientRect(),
+    yesBtn.getBoundingClientRect()
+  ];
 
-      const maxX = box.width - noBtn.offsetWidth;
-      const maxY = box.height - noBtn.offsetHeight;
+  let x, y, tries = 0;
+  const btnWidth = noBtn.offsetWidth;
+  const btnHeight = noBtn.offsetHeight;
 
-      let x, y, tries = 0;
+  while (tries < 50) {
+    x = Math.random() * (screen.width - btnWidth);
+    y = Math.random() * (screen.height - btnHeight);
 
-      while (tries < 30) {
-        x = Math.random() * maxX;
-        y = Math.random() * maxY;
+    const future = {
+      left: x,
+      right: x + btnWidth,
+      top: y,
+      bottom: y + btnHeight
+    };
 
-        const future = {
-          left: box.left + x,
-          right: box.left + x + noBtn.offsetWidth,
-          top: box.top + y,
-          bottom: box.top + y + noBtn.offsetHeight
-        };
+    let overlaps = false;
 
-        const overlap =
-          !(future.right < yesRect.left ||
-            future.left > yesRect.right ||
-            future.bottom < yesRect.top ||
-            future.top > yesRect.bottom);
+    for (const zone of forbidden) {
+      const hit =
+        !(future.right < zone.left ||
+          future.left > zone.right ||
+          future.bottom < zone.top ||
+          future.top > zone.bottom);
 
-        if (!overlap) break;
-        tries++;
+      if (hit) {
+        overlaps = true;
+        break;
       }
+    }
 
-      noBtn.style.left = x + "px";
-      noBtn.style.top = y + "px";
-    });
+    if (!overlaps) break;
+    tries++;
+  }
 
+  noBtn.style.position = "fixed";
+  noBtn.style.left = x + "px";
+  noBtn.style.top = y + "px";
+});
+
+
+    // kattintásra csak kisebb lesz, pozíció marad
     noBtn.addEventListener("click", () => {
       noScale *= 0.8;
       noBtn.style.transform = `scale(${noScale})`;
