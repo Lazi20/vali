@@ -270,54 +270,17 @@
     let noScale = 1;
 
 noBtn.addEventListener("mouseenter", () => {
-  const forbidden = [
-    document.getElementById("titleText").getBoundingClientRect(),
-    document.querySelector(".card p").getBoundingClientRect(),
-    yesBtn.getBoundingClientRect()
-  ];
-
   const btn = noBtn.getBoundingClientRect();
 
-  // nagyon kicsi mozgás
-  const maxMove = 20;
+  // kb. 10px-es random mozgás
+  const maxMove = 10;
 
-  let tries = 0;
-  let newX, newY;
+  let newX = btn.left + (Math.random() * maxMove * 2 - maxMove);
+  let newY = btn.top + (Math.random() * maxMove * 2 - maxMove);
 
-  while (tries < 50) {
-    // kis elmozdulás a jelenlegi helyhez képest
-    newX = btn.left + (Math.random() * maxMove * 2 - maxMove);
-    newY = btn.top + (Math.random() * maxMove * 2 - maxMove);
-
-    // ne menjen ki a képernyőről
-    newX = Math.max(0, Math.min(window.innerWidth - btn.width, newX));
-    newY = Math.max(0, Math.min(window.innerHeight - btn.height, newY));
-
-    const future = {
-      left: newX,
-      right: newX + btn.width,
-      top: newY,
-      bottom: newY + btn.height
-    };
-
-    let overlaps = false;
-
-    for (const zone of forbidden) {
-      const hit =
-        !(future.right < zone.left ||
-          future.left > zone.right ||
-          future.bottom < zone.top ||
-          future.top > zone.bottom);
-
-      if (hit) {
-        overlaps = true;
-        break;
-      }
-    }
-
-    if (!overlaps) break;
-    tries++;
-  }
+  // ne menjen ki a képernyőről
+  newX = Math.max(0, Math.min(window.innerWidth - btn.width, newX));
+  newY = Math.max(0, Math.min(window.innerHeight - btn.height, newY));
 
   noBtn.style.position = "fixed";
   noBtn.style.left = newX + "px";
