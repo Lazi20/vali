@@ -270,37 +270,32 @@
     let noScale = 1;
 
 noBtn.addEventListener("mouseenter", () => {
-  const screen = document.body.getBoundingClientRect();
-
   const forbidden = [
     document.getElementById("titleText").getBoundingClientRect(),
     document.querySelector(".card p").getBoundingClientRect(),
     yesBtn.getBoundingClientRect()
   ];
 
-  const btnWidth = noBtn.offsetWidth;
-  const btnHeight = noBtn.offsetHeight;
-
-  // nagyon kicsi mozgás
-  const maxMove = 60;
+  const btn = noBtn.getBoundingClientRect();
+  const maxMove = 30; // nagyon kicsi mozgás
 
   let tries = 0;
-  let x, y;
+  let newX, newY;
 
   while (tries < 50) {
-    const current = noBtn.getBoundingClientRect();
+    // kis elmozdulás
+    newX = btn.left + (Math.random() * maxMove * 2 - maxMove);
+    newY = btn.top + (Math.random() * maxMove * 2 - maxMove);
 
-    x = current.left + (Math.random() * maxMove * 2 - maxMove);
-    y = current.top + (Math.random() * maxMove * 2 - maxMove);
-
-    x = Math.max(0, Math.min(screen.width - btnWidth, x));
-    y = Math.max(0, Math.min(screen.height - btnHeight, y));
+    // ne menjen ki a képernyőről
+    newX = Math.max(0, Math.min(window.innerWidth - btn.width, newX));
+    newY = Math.max(0, Math.min(window.innerHeight - btn.height, newY));
 
     const future = {
-      left: x,
-      right: x + btnWidth,
-      top: y,
-      bottom: y + btnHeight
+      left: newX,
+      right: newX + btn.width,
+      top: newY,
+      bottom: newY + btn.height
     };
 
     let overlaps = false;
@@ -323,9 +318,10 @@ noBtn.addEventListener("mouseenter", () => {
   }
 
   noBtn.style.position = "fixed";
-  noBtn.style.left = x + "px";
-  noBtn.style.top = y + "px";
+  noBtn.style.left = newX + "px";
+  noBtn.style.top = newY + "px";
 });
+
 
 
 
