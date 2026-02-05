@@ -272,7 +272,6 @@
 noBtn.addEventListener("mouseenter", () => {
   const screen = document.body.getBoundingClientRect();
 
-  // Tiltott zónák (szövegek + igen gomb)
   const forbidden = [
     document.getElementById("titleText").getBoundingClientRect(),
     document.querySelector(".card p").getBoundingClientRect(),
@@ -282,8 +281,8 @@ noBtn.addEventListener("mouseenter", () => {
   const btnWidth = noBtn.offsetWidth;
   const btnHeight = noBtn.offsetHeight;
 
-  // maximum elmozdulás px-ben
-  const maxMove = 150;
+  // nagyon kicsi mozgás
+  const maxMove = 60;
 
   let tries = 0;
   let x, y;
@@ -291,11 +290,9 @@ noBtn.addEventListener("mouseenter", () => {
   while (tries < 50) {
     const current = noBtn.getBoundingClientRect();
 
-    // új pozíció: csak maxMove távolságra
     x = current.left + (Math.random() * maxMove * 2 - maxMove);
     y = current.top + (Math.random() * maxMove * 2 - maxMove);
 
-    // ne menjen ki a képernyőről
     x = Math.max(0, Math.min(screen.width - btnWidth, x));
     y = Math.max(0, Math.min(screen.height - btnHeight, y));
 
@@ -329,6 +326,7 @@ noBtn.addEventListener("mouseenter", () => {
   noBtn.style.left = x + "px";
   noBtn.style.top = y + "px";
 });
+
 
 
   </script>
