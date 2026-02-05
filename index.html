@@ -224,7 +224,28 @@
         errorMsg.textContent = "Hibás jelszó! 😢";
       }
     }
+// 1. Definiáljuk a határokat
+const screenWidth = window.innerWidth;
+const screenHeight = window.innerHeight;
 
+function moveObject(targetX, targetY) {
+    // 2. Érzékenység finomítása (Smoothing)
+    // Ha a mozdulat túl nagy, egy "lerp" (lineáris interpoláció) segíthet
+    let smoothX = targetX;
+    let smoothY = targetY;
+
+    // 3. Kényszerítés a határok közé (Clamping)
+    // Megakadályozza, hogy a sarokba ragadjon vagy kimenjen a képből
+    if (smoothX < 0) smoothX = 0;
+    if (smoothX > screenWidth) smoothX = screenWidth;
+    
+    if (smoothY < 0) smoothY = 0;
+    if (smoothY > screenHeight) smoothY = screenHeight;
+
+    // 4. Alkalmazzuk a pozíciót
+    element.style.left = smoothX + "px";
+    element.style.top = smoothY + "px";
+}
     // Írógép effekt
     function typeWriter(text, element, speed = 80) {
       let i = 0;
