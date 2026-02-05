@@ -277,13 +277,15 @@ noBtn.addEventListener("mouseenter", () => {
   ];
 
   const btn = noBtn.getBoundingClientRect();
-  const maxMove = 1; // nagyon kicsi mozgás
+
+  // nagyon kicsi mozgás
+  const maxMove = 20;
 
   let tries = 0;
   let newX, newY;
 
   while (tries < 50) {
-    // kis elmozdulás
+    // kis elmozdulás a jelenlegi helyhez képest
     newX = btn.left + (Math.random() * maxMove * 2 - maxMove);
     newY = btn.top + (Math.random() * maxMove * 2 - maxMove);
 
@@ -321,6 +323,7 @@ noBtn.addEventListener("mouseenter", () => {
   noBtn.style.left = newX + "px";
   noBtn.style.top = newY + "px";
 });
+
 
 
 
