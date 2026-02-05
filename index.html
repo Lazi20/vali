@@ -127,8 +127,15 @@
       cursor: pointer;
       transition: 0.2s ease;
       position: absolute;
+      user-select: none;
     }
-#noBtn:hover { transform: none !important; }
+
+    /* Teljesen tiltjuk a no gomb transformját és hover skálázását */
+    #noBtn, #noBtn:hover {
+      transform: none !important;
+      transition: none !important;
+    }
+
     #yesBtn {
       background: #ff2f6f;
       color: white;
@@ -203,7 +210,7 @@
 
       <div class="buttons">
         <button id="yesBtn">Igen 💖</button>
-        <button id="noBtn">Nem 😢</button>
+        <button id="noBtn" type="button" aria-label="Nem gomb">Nem 😢</button>
       </div>
     </div>
   </div>
@@ -267,30 +274,82 @@
       popup.classList.add("show");
     });
 
-    let noScale = 1;
+    // --- NO gomb: kicsi, random elmozdulás (~10px), kattintás/billentyű letiltva ---
+    // Megjegyzés: a gomb továbbra is látható és interaktívnak tűnik, de minden kattintást és
+    // billentyűeseményt megakadályozunk, így nem lehet rá hatékonyan rákattintani.
 
-noBtn.addEventListener("mouseenter", () => {
-  const btn = noBtn.getBoundingClientRect();
+    // Megakadályozzuk a kattintást és pointerdown eseményeket
+    function blockEvent(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
 
-  // kb. 10px-es random mozgás
-  const maxMove = 10;
+    noBtn.addEventListener("click", blockEvent, true);
+    noBtn.addEventListener("pointerdown", blockEvent, true);
+    noBtn.addEventListener("mousedown", blockEvent, true);
+    noBtn.addEventListener("touchstart", blockEvent, { passive: false });
 
-  let newX = btn.left + (Math.random() * maxMove * 2 - maxMove);
-  let newY = btn.top + (Math.random() * maxMove * 2 - maxMove);
+    // Megakadályozzuk a billentyűvel történő aktiválást (Enter / Space)
+    noBtn.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
 
-  // ne menjen ki a képernyőről
-  newX = Math.max(0, Math.min(window.innerWidth - btn.width, newX));
-  newY = Math.max(0, Math.min(window.innerHeight - btn.height, newY));
+    // Kicsi (~10px) random elmozdulás egér fölé vitelekor
+    noBtn.addEventListener("mouseenter", () => {
+      // lekérjük a gomb aktuális helyét
+      const btn = noBtn.getBoundingClientRect();
 
-  noBtn.style.position = "fixed";
-  noBtn.style.left = newX + "px";
-  noBtn.style.top = newY + "px";
-});
+      // kb. 10px-es random mozgás
+      const maxMove = 10;
 
+      let newX = btn.left + (Math.random() * maxMove * 2 - maxMove);
+      let newY = btn.top + (Math.random() * maxMove * 2 - maxMove);
 
+      // ne menjen ki a képernyőről (viewport)
+      newX = Math.max(0, Math.min(window.innerWidth - btn.width, newX));
+      newY = Math.max(0, Math.min(window.innerHeight - btn.height, newY));
 
+      // állítsuk fixed pozícióra, hogy a mozgatás stabil legyen
+      noBtn.style.position = "fixed";
+      noBtn.style.left = newX + "px";
+      noBtn.style.top = newY + "px";
+      // biztosítsuk, hogy a gomb ne kapjon fókuszt automatikusan
+      noBtn.blur();
+    });
 
+    // Ha valamilyen okból mégis fókusz kerülne rá (pl. tab), azonnal elmozdítjuk
+    noBtn.addEventListener("focus", () => {
+      const btn = noBtn.getBoundingClientRect();
+      const maxMove = 10;
+      let newX = btn.left + (Math.random() * maxMove * 2 - maxMove);
+      let newY = btn.top + (Math.random() * maxMove * 2 - maxMove);
+      newX = Math.max(0, Math.min(window.innerWidth - btn.width, newX));
+      newY = Math.max(0, Math.min(window.innerHeight - btn.height, newY));
+      noBtn.style.position = "fixed";
+      noBtn.style.left = newX + "px";
+      noBtn.style.top = newY + "px";
+      noBtn.blur();
+    });
 
+    // opcionális: ha az ablak mérete változik, visszaállítjuk a no gombot a kártya jobb oldalára
+    window.addEventListener("resize", () => {
+      // ha a gomb fixed pozícióban van, próbáljuk meg visszahelyezni a kártya jobb oldalára
+      const card = document.querySelector(".card");
+      if (!card) return;
+      const cardRect = card.getBoundingClientRect();
+      const btn = noBtn.getBoundingClientRect();
+      // csak akkor állítjuk vissza, ha a gomb túl közel van a szélekhez
+      if (btn.left + btn.width > window.innerWidth - 10 || btn.top + btn.height > window.innerHeight - 10) {
+        noBtn.style.position = "absolute";
+        noBtn.style.right = "0px";
+        noBtn.style.top = "20px";
+        noBtn.style.left = "";
+      }
+    });
   </script>
 
 </body>
