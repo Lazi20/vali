@@ -21,7 +21,6 @@
       justify-content: center;
     }
 
-    /* Lebegő szívek */
     .heart {
       position: fixed;
       bottom: -20px;
@@ -36,7 +35,6 @@
       100% { transform: translateY(-120vh) scale(1.8); opacity: 0; }
     }
 
-    /* Login képernyő */
     #loginScreen {
       position: fixed;
       inset: 0;
@@ -80,10 +78,8 @@
     }
 
     #loginBtn:hover { background: #e6225f; }
-
     #errorMsg { color: #d63031; font-size: 0.85rem; margin-bottom: 10px; min-height: 1.2rem; }
 
-    /* Fő tartalom */
     #mainContent {
       display: none; 
       flex-direction: column;
@@ -107,11 +103,10 @@
     p { color: #444; margin-bottom: 25px; line-height: 1.4; }
 
     .buttons {
-      position: relative;
-      height: 60px;
       display: flex;
       justify-content: space-around;
       align-items: center;
+      gap: 10px;
     }
 
     #yesBtn, #noBtn {
@@ -121,13 +116,13 @@
       font-size: 1rem;
       cursor: pointer;
       font-weight: bold;
+      transition: transform 0.2s ease;
     }
 
     #yesBtn {
       background: #ff2f6f;
       color: white;
       box-shadow: 0 8px 20px rgba(255, 47, 111, 0.4);
-      transition: transform 0.2s;
     }
 
     #yesBtn:hover { transform: scale(1.1); }
@@ -136,10 +131,9 @@
       background: white;
       color: #ff2f6f;
       border: 2px solid #ff2f6f;
-      transition: 0.1s ease; /* Gyorsabb reakció az elugrásnál */
+      position: relative;
     }
 
-    /* Popup */
     .popup {
       position: fixed;
       inset: 0;
@@ -210,10 +204,6 @@
 
     const correctPassword = "asd";
 
-    // Belépés kezelése
-    loginBtn.addEventListener("click", performLogin);
-    passwordInput.addEventListener("keypress", (e) => { if(e.key === "Enter") performLogin(); });
-
     function performLogin() {
       if (passwordInput.value === correctPassword) {
         loginScreen.style.display = "none";
@@ -224,29 +214,10 @@
         errorMsg.textContent = "Hibás jelszó! 😢";
       }
     }
-// 1. Definiáljuk a határokat
-const screenWidth = window.innerWidth;
-const screenHeight = window.innerHeight;
 
-function moveObject(targetX, targetY) {
-    // 2. Érzékenység finomítása (Smoothing)
-    // Ha a mozdulat túl nagy, egy "lerp" (lineáris interpoláció) segíthet
-    let smoothX = targetX;
-    let smoothY = targetY;
+    loginBtn.addEventListener("click", performLogin);
+    passwordInput.addEventListener("keypress", (e) => { if(e.key === "Enter") performLogin(); });
 
-    // 3. Kényszerítés a határok közé (Clamping)
-    // Megakadályozza, hogy a sarokba ragadjon vagy kimenjen a képből
-    if (smoothX < 0) smoothX = 0;
-    if (smoothX > screenWidth) smoothX = screenWidth;
-    
-    if (smoothY < 0) smoothY = 0;
-    if (smoothY > screenHeight) smoothY = screenHeight;
-
-    // 4. Alkalmazzuk a pozíciót
-    element.style.left = smoothX + "px";
-    element.style.top = smoothY + "px";
-}
-    // Írógép effekt
     function typeWriter(text, element, speed = 120) {
       let i = 0;
       element.innerHTML = "";
@@ -260,50 +231,32 @@ function moveObject(targetX, targetY) {
       typing();
     }
 
-    // Szívecske eső
     setInterval(() => {
       const heart = document.createElement("div");
       heart.classList.add("heart");
       heart.textContent = ["💖","💗","❤️","💕"][Math.floor(Math.random()*4)];
       heart.style.left = Math.random() * 100 + "vw";
       heart.style.animationDuration = (Math.random() * 2 + 3) + "s";
-      heart.style.fontSize = (Math.random() * 1 + 1) + "rem";
       document.body.appendChild(heart);
       setTimeout(() => heart.remove(), 4000);
     }, 400);
 
-    // IGEN gomb
     yesBtn.addEventListener("click", () => {
       popup.classList.add("show");
     });
 
-    // NEM gomb menekülő logika
-    const moveNoButton = () => {
-      // Megadjuk a határokat, hogy ne ugorjon ki a képernyőről
-      const padding = 20;
-      const maxX = window.innerWidth - noBtn.offsetWidth - padding;
-      const maxY = window.innerHeight - noBtn.offsetHeight - padding;
-
-      // Random új pozíció
-      const randomX = Math.floor(Math.random() * (maxX - padding) + padding);
-      const randomY = Math.floor(Math.random() * (maxY - padding) + padding);
-
-      noBtn.style.position = "fixed";
-      noBtn.style.left = `${randomX}px`;
-      noBtn.style.top = `${randomY}px`;
+    // A kis mozdítás logikája (Nem gomb)
+    const nudgeButton = () => {
+      const x = (Math.random() - 0.5) * 40; // max 20px eltolás oldalra
+      const y = (Math.random() - 0.5) * 40; // max 20px eltolás fel/le
+      noBtn.style.transform = `translate(${x}px, ${y}px)`;
     };
 
-    // Események a Nem gombra: érintés és egér közelítés
-    noBtn.addEventListener("mouseover", moveNoButton);
+    noBtn.addEventListener("mouseover", nudgeButton);
+    noBtn.addEventListener("click", nudgeButton);
     noBtn.addEventListener("touchstart", (e) => {
-      e.preventDefault(); // Megakadályozza a mobilos klikket
-      moveNoButton();
-    });
-
-    // Ha valahogy mégis rákattintanának (pl. Tab + Enter)
-    noBtn.addEventListener("click", (e) => {
         e.preventDefault();
-        moveNoButton();
+        nudgeButton();
     });
 
   </script>
