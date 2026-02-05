@@ -114,8 +114,8 @@
     }
 
     .buttons {
-      position: relative;
-      height: 80px;      /* itt mozog a Nem gomb, a szöveg alatt */
+      position: relative;   /* fontos: a noBtn absolute pozíciója ehhez igazodik */
+      height: 80px;         /* itt mozog a Nem gomb, a szöveg alatt */
       margin-top: 10px;
     }
 
@@ -130,10 +130,11 @@
       user-select: none;
     }
 
-    /* Teljesen tiltjuk a no gomb transformját és hover skálázását */
+    /* A no gomb ne skálázódjon, és simán csússzon left/top változtatásra */
     #noBtn, #noBtn:hover {
       transform: none !important;
-      transition: none !important;
+      transition: left 0.14s cubic-bezier(.2,.8,.2,1), top 0.14s cubic-bezier(.2,.8,.2,1);
+      will-change: left, top;
     }
 
     #yesBtn {
@@ -148,6 +149,7 @@
       transform: scale(1.05);
     }
 
+    /* alaphelyzet: jobb oldalon a kártyán belül */
     #noBtn {
       background: white;
       color: #ff2f6f;
@@ -209,7 +211,7 @@
       <p>Gondold át jól… de az „Igen” amúgy nagyon jó választás 😏</p>
 
       <div class="buttons">
-        <button id="yesBtn">Igen 💖</button>
+        <button id="yesBtn" type="button">Igen 💖</button>
         <button id="noBtn" type="button" aria-label="Nem gomb">Nem 😢</button>
       </div>
     </div>
@@ -274,23 +276,19 @@
       popup.classList.add("show");
     });
 
-    // --- NO gomb: kicsi, random elmozdulás (~10px), kattintás/billentyű letiltva ---
-    // Megjegyzés: a gomb továbbra is látható és interaktívnak tűnik, de minden kattintást és
-    // billentyűeseményt megakadályozunk, így nem lehet rá hatékonyan rákattintani.
-
-    // Megakadályozzuk a kattintást és pointerdown eseményeket
+    // --- NO gomb: kicsi, sima random elmozdulás (~10px) a .buttons konténeren belül ---
+    // Blokkoljuk a kattintást és pointer eseményeket, hogy ne lehessen rákattintani
     function blockEvent(e) {
       e.preventDefault();
       e.stopPropagation();
       return false;
     }
-
     noBtn.addEventListener("click", blockEvent, true);
     noBtn.addEventListener("pointerdown", blockEvent, true);
     noBtn.addEventListener("mousedown", blockEvent, true);
     noBtn.addEventListener("touchstart", blockEvent, { passive: false });
 
-    // Megakadályozzuk a billentyűvel történő aktiválást (Enter / Space)
+    // Tiltjuk a billentyűs aktiválást (Enter / Space)
     noBtn.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
         e.preventDefault();
@@ -298,56 +296,72 @@
       }
     });
 
-    // Kicsi (~10px) random elmozdulás egér fölé vitelekor
+    // Segédfüggvény: clamp
+    function clamp(v, a, b) {
+      return Math.max(a, Math.min(b, v));
+    }
+
+    // Finom, kis random elmozdulás a .buttons konténeren belül
     noBtn.addEventListener("mouseenter", () => {
-      // lekérjük a gomb aktuális helyét
-      const btn = noBtn.getBoundingClientRect();
+      const container = document.querySelector(".buttons");
+      if (!container) return;
 
-      // kb. 10px-es random mozgás
-      const maxMove = 2;
+      const contRect = container.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
 
-      let newX = btn.left + (Math.random(1,2) * maxMove * 2 - maxMove);
-      let newY = btn.top + (Math.random(1,2) * maxMove * 2 - maxMove);
+      // max elmozdulás pixelekben (állítható)
+      const maxMove = 10; // kb. 10px
 
-      // ne menjen ki a képernyőről (viewport)
-      newX = Math.max(0, Math.min(window.innerWidth - btn.width, newX));
-      newY = Math.max(0, Math.min(window.innerHeight - btn.height, newY));
+      // jelenlegi pozíció a konténerhez viszonyítva
+      const curLeft = btnRect.left - contRect.left;
+      const curTop  = btnRect.top  - contRect.top;
 
-      // állítsuk fixed pozícióra, hogy a mozgatás stabil legyen
-      noBtn.style.position = "fixed";
-      noBtn.style.left = newX + "px";
-      noBtn.style.top = newY + "px";
-      // biztosítsuk, hogy a gomb ne kapjon fókuszt automatikusan
+      // új pozíció: csak kis véletlenszerű elmozdulás
+      let newLeft = curLeft + (Math.random() * maxMove * 2 - maxMove);
+      let newTop  = curTop  + (Math.random() * maxMove * 2 - maxMove);
+
+      // határok: ne lépjen ki a konténerből
+      newLeft = clamp(newLeft, 0, contRect.width - btnRect.width);
+      newTop  = clamp(newTop, 0, contRect.height - btnRect.height);
+
+      // alkalmazzuk absolute pozícióként a konténeren belül
+      // ha korábban 'right' volt beállítva, töröljük, hogy left működjön
+      noBtn.style.position = "absolute";
+      noBtn.style.right = "auto";
+      noBtn.style.left = newLeft + "px";
+      noBtn.style.top  = newTop  + "px";
+
+      // ne kapjon fókuszt automatikusan
       noBtn.blur();
     });
 
-    // Ha valamilyen okból mégis fókusz kerülne rá (pl. tab), azonnal elmozdítjuk
+    // Ha fókusz kerülne rá (pl. tab), azonnal elmozdítjuk ugyanígy
     noBtn.addEventListener("focus", () => {
-      const btn = noBtn.getBoundingClientRect();
-      const maxMove = 10;
-      let newX = btn.left + (Math.random() * maxMove * 2 - maxMove);
-      let newY = btn.top + (Math.random() * maxMove * 2 - maxMove);
-      newX = Math.max(0, Math.min(window.innerWidth - btn.width, newX));
-      newY = Math.max(0, Math.min(window.innerHeight - btn.height, newY));
-      noBtn.style.position = "fixed";
-      noBtn.style.left = newX + "px";
-      noBtn.style.top = newY + "px";
-      noBtn.blur();
+      const ev = new Event("mouseenter");
+      noBtn.dispatchEvent(ev);
     });
 
-    // opcionális: ha az ablak mérete változik, visszaállítjuk a no gombot a kártya jobb oldalára
+    // Ablak átméretezéskor biztosítjuk, hogy a gomb a konténeren belül maradjon
     window.addEventListener("resize", () => {
-      // ha a gomb fixed pozícióban van, próbáljuk meg visszahelyezni a kártya jobb oldalára
-      const card = document.querySelector(".card");
-      if (!card) return;
-      const cardRect = card.getBoundingClientRect();
-      const btn = noBtn.getBoundingClientRect();
-      // csak akkor állítjuk vissza, ha a gomb túl közel van a szélekhez
-      if (btn.left + btn.width > window.innerWidth - 10 || btn.top + btn.height > window.innerHeight - 10) {
+      const container = document.querySelector(".buttons");
+      if (!container) return;
+      const contRect = container.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      // ha a gomb kilógna, igazítjuk
+      let curLeft = btnRect.left - contRect.left;
+      let curTop  = btnRect.top  - contRect.top;
+
+      const maxLeft = contRect.width - btnRect.width;
+      const maxTop  = contRect.height - btnRect.height;
+
+      if (curLeft > maxLeft || curTop > maxTop) {
+        curLeft = clamp(curLeft, 0, Math.max(0, maxLeft));
+        curTop  = clamp(curTop, 0, Math.max(0, maxTop));
         noBtn.style.position = "absolute";
-        noBtn.style.right = "0px";
-        noBtn.style.top = "20px";
-        noBtn.style.left = "";
+        noBtn.style.right = "auto";
+        noBtn.style.left = curLeft + "px";
+        noBtn.style.top  = curTop  + "px";
       }
     });
   </script>
