@@ -188,7 +188,7 @@
   <div class="popup" id="popup">
     <div class="popup-card">
       💖 Tudtam, hogy igent mondasz, Pannika! 💖<br><br>
-      Most már hivatalos: te vagy a Valentinom! 🌹
+      Most már hivatalos: te vagy az én Valentinom! 🌹
     </div>
   </div>
 
@@ -245,19 +245,50 @@
       popup.classList.add("show");
     });
 
-    // A kis mozdítás logikája (Nem gomb)
-    const nudgeButton = () => {
-      const x = (Math.random() - 0.5) * 40; // max 20px eltolás oldalra
-      const y = (Math.random() - 0.5) * 40; // max 20px eltolás fel/le
-      noBtn.style.transform = `translate(${x}px, ${y}px)`;
-    };
+let noBtnScale = 1;
 
-    noBtn.addEventListener("mouseover", nudgeButton);
-    noBtn.addEventListener("click", nudgeButton);
-    noBtn.addEventListener("touchstart", (e) => {
-        e.preventDefault();
-        nudgeButton();
-    });
+const nudgeButton = () => {
+  const btnWidth = noBtn.offsetWidth * noBtnScale;
+  const btnHeight = noBtn.offsetHeight * noBtnScale;
+
+  // Középső 50% tartomány
+  const minX = window.innerWidth * 0.25;
+  const maxX = window.innerWidth * 0.75 - btnWidth;
+
+  const minY = window.innerHeight * 0.25;
+  const maxY = window.innerHeight * 0.75 - btnHeight;
+
+  // Garantáltan a tartományon belül marad
+  const randomX = Math.max(minX, Math.min(maxX, minX + Math.random() * (maxX - minX)));
+  const randomY = Math.max(minY, Math.min(maxY, minY + Math.random() * (maxY - minY)));
+
+  noBtn.style.position = "fixed";
+  noBtn.style.left = randomX + "px";
+  noBtn.style.top = randomY + "px";
+};
+
+const shrinkButton = () => {
+  noBtnScale -= 0.1;
+  if (noBtnScale < 0.4) noBtnScale = 0.4;
+  noBtn.style.transform = `scale(${noBtnScale})`;
+};
+
+//noBtn.addEventListener("mouseover", nudgeButton);
+
+noBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  nudgeButton();
+  shrinkButton();
+});
+
+noBtn.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  nudgeButton();
+  shrinkButton();
+});
+
+
+
 
   </script>
 </body>
