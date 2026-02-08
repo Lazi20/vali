@@ -202,7 +202,7 @@
     const noBtn = document.getElementById("noBtn");
     const popup = document.getElementById("popup");
 
-    const correctPassword = "asd";
+    const correctPassword = "2023.07.07";
 
     function performLogin() {
       if (passwordInput.value === correctPassword) {
@@ -273,7 +273,7 @@ const shrinkButton = () => {
   noBtn.style.transform = `scale(${noBtnScale})`;
 };
 
-//noBtn.addEventListener("mouseover", nudgeButton);
+noBtn.addEventListener("mouseover", nudgeButton);
 
 noBtn.addEventListener("click", (e) => {
   e.preventDefault();
